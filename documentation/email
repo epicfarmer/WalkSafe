@@ -1,0 +1,14 @@
+Hey Christiana,
+
+Wanted to let you know what's up with the project a little.  The first thing to do is get you set up with github.  If you go to https://github.com, you can create an account.  If you haven't used git before, there are guis here https://git-scm.com/download/gui/windows that you can try.  I haven't used it on windows, so I don't know which one to recommend.  Once you've gotten set up, the project is called WalkSafe.  Once you've got git setup, let me know your information and I'll invite you.
+
+On the github page, we have a wiki (there should be a link on the main page), and a small amount of code.  For now, you can ignore the code and focus on the wiki.  It should explain the data we have found, and the algorithmic approaches we're looking at (of course, both could probably be improved upon if you have ideas).
+
+Most of what we've done is assemble that wiki, though Kathryn has downloaded some of the data sets, and I've started writing a simple histogram classifier.  We agreed to use python as the main language (unless there's something that can't easily be done).
+
+As for what you can do for next week.  You should brainstorm algorithms and approaches to data analysis that might be helpful (and add them to the wiki).  If you have time in addition to that, maybe take a look at the algorithms and data, and bring comments.  Hopefully Kathryn and I will have a tentative dataset by next Tuesday to start playing with, and there'll be more to do then.
+
+Thanks,
+Joshua
+
+PS Sorry for the long email.[
