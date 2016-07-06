@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 ####Expectations: Data comes in a pd.DataFrame with three colums
 ####              x, y, and impact
 ####
-####	x      - the x coordinate of the crime
+####  x      - the x coordinate of the crime
 ####  y      - the y coordinate of the crime
 ####  t      - the time of the crime
 ####  impact - the severity of the crime as a number between 0
@@ -58,7 +58,7 @@ def rasterizeData(data,binSize):
 	ymax = np.max(data['y']);
 	xbins = int(np.ceil((xmax-xmin)/binSize));
 	ybins = int(np.ceil((ymax-ymin)/binSize));
-	raster = np.zeros([xbins,ybins],np.float32);
+	raster = np.zeros([ybins,xbins],np.float32);
 	print np.shape(data)[0]
 	#Vectorize this
 	for i in range((np.shape(data))[0]):
@@ -69,7 +69,7 @@ def rasterizeData(data,binSize):
 		ybin = np.floor((ymax - row['y'])/(ymax-ymin)*ybins);
 		if(ybin == ybins):
 			ybin -=1;
-		raster[xbin,ybin] += 1;
+		raster[ybin,-xbin] += 1;
 	return raster
 
 def estimateBoundary(rasterizedData,threshold,number):
