@@ -72,6 +72,11 @@ def rasterizeData(data,binSize):
 		raster[ybin,-xbin] += 1;
 	return raster
 
+def estimatePxy(data,x,y):
+	for i in range((np.shape(data))[0]):
+		distance = sqrt((x - data[i,'x'])**2 + (x - data[i,'x'])**2)
+
+
 def estimateBoundary(rasterizedData,threshold,number):
 	mask = np.zeros(np.shape(rasterizedData));
 	mask = rasterizedData*1./number > (threshold*1./np.prod(np.shape(rasterizedData)));
