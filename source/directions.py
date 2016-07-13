@@ -1,20 +1,29 @@
-import requests
 import pprint
+import googlemaps
 
+DISTANCE_MATRIX_URL ='https://maps.googleapis.com/maps/api/distancematrix/json'
+DIRECTIONS_URL = 'https://maps.googleapis.com/maps/api/directions/json'
 
 def api_key():
-    with open("/Users/Kathryn/Desktop/GoogleMapKey", 'r') as fh:
+    with open(THE_KEY_FILE, 'r') as fh:
         return fh.read().strip()
 
 API_KEY = api_key()
 
-base_url = 'https://maps.googleapis.com/maps/api/directions/json'
-params = {"origin": "11 Yogurt Lane, Baltimore, MD",
-          "destination": "615 N Wolfe Street, Baltimore, MD",
-          "mode": "walking",
-          "key": API_KEY}
 
-r = requests.get(base_url, params=params)
-print r.url
+gmaps = googlemaps.Client(key=API_KEY)
 
-pprint.pprint(r.json())
+geocode_result = gmaps.distance_matrix(['615 N Wolfe Street, Baltimore, MD'],
+                                       ['501 E Pratt Street, Baltimore, MD', '333 W Camden St, Baltimore, MD'],
+                                       mode="walking")
+
+pprint.pprint(geocode_result)
+
+def directions(origin, destination):
+    # Request directions via public transit
+    directions_result = gmaps.directions(origin,
+                                     destination,
+                                     mode="walking")
+
+
+
