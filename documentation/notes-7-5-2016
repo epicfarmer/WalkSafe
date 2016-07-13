@@ -1,0 +1,20 @@
+Want to be able to filter by category:
+	Crime type
+		category decreasing severity by number
+	Time of day
+	Date onward
+	Generally clean up the data columns
+
+Move from descriptive to predictive
+	Approximate p(crime | x)
+		start: x = location
+		right now we have p(x,y)
+		want p(y | x) 
+		later: x = location, time of day, information from other data sets (dst_to_school
+
+Start adding new data
+
+Homework:
+	Kathryn:		Get walking directions from JHSPH to the metro using the google api
+	Joshua:			Given an edge, come up with an algorithm to map crime data to the edge
+	Christiana:	Figure out how to filter by category
