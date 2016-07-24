@@ -69,8 +69,9 @@ def rasterizeData(data,binSize):
 		ybin = np.floor((ymax - row['y'])/(ymax-ymin)*ybins);
 		if(ybin == ybins):
 			ybin -=1;
-		raster[ybin,-xbin] += 1;
-	return raster
+		raster[ybin,-xbin] += 1./row.shape[0];
+		X,Y = np.meshgrid(np.arange(xmin,xmax,binSize),np.arange(ymin,ymax,binSize))
+	return [raster,X,Y]
 
 def estimatePxy(data,x,y):
 	for i in range((np.shape(data))[0]):

@@ -11,7 +11,7 @@ latlong_data = latlong_data[latlong_data["y"] < 40]
 year = data.loc[:,"CrimeDate"].str.split('/').str.get(2).astype('float')
 plt.plot(latlong_data['x'].values,latlong_data['y'].values,'r*')
 #plt.show()
-raster_data = ls.rasterizeData(latlong_data,.005)
+raster_data,xinfo,yinfo = ls.rasterizeData(latlong_data,.005)
 ls.plotRasterData(raster_data)
 
 
