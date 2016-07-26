@@ -45,11 +45,9 @@ def getTestData(number_rows=10,include_t=False,include_impact=False):
 
 def plotData(data):
 	plt.plot(data['x'],data['y'],'+');
-	plt.show();
 
-def plotRasterData(data):
-	plt.imshow(data,interpolation=None);
-	plt.show();
+def plotRasterData(X,Y,data):
+	plt.pcolormesh(X,Y,data)
 
 def rasterizeData(data,binSize):
 	xmin = np.min(data['x']);
@@ -63,13 +61,15 @@ def rasterizeData(data,binSize):
 	#Vectorize this
 	for i in range((np.shape(data))[0]):
 		row = data.iloc[i,:];
-		xbin = np.floor((xmax - row['x'])/(xmax-xmin)*xbins);
+		#xbin = np.floor((xmax - row['x'])/(xmax-xmin)*xbins);
+		xbin = np.floor((row['x'] - xmin)/(xmax-xmin)*xbins);
 		if(xbin == xbins):
 			xbin -=1;
-		ybin = np.floor((ymax - row['y'])/(ymax-ymin)*ybins);
+		#ybin = np.floor((ymax - row['y'])/(ymax-ymin)*ybins);
+		ybin = np.floor((row['y'] - ymin)/(ymax-ymin)*ybins);
 		if(ybin == ybins):
 			ybin -=1;
-		raster[ybin,-xbin] += 1./row.shape[0];
+		raster[ybin,xbin] += 1./data.shape[0]*xbins*ybins;
 		X,Y = np.meshgrid(np.arange(xmin,xmax,binSize),np.arange(ymin,ymax,binSize))
 	return [raster,X,Y]
 
