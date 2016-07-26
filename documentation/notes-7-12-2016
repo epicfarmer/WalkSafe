@@ -1,0 +1,19 @@
+We discussed the google api for maps.  We found a python version of the google api for maps (googlemaps).  We found a python library to deal with linelists (linelist).  We found a python library to potentially handle the intersection of polygons (the raster grid) with linelists.
+
+We also codified our plan:
+
+1.	Start with a collection of points in baltimore
+	Not everyone agrees with this step.
+	There is suggestion for doing some computation on the fly.
+2.	Compute the distances between points using googles api
+3.	For points within a certain threshold, compute the linelist path connecting them.
+4.	For each linelist, weight it according to the predicted crime data.
+5.	Use the new linelists to compute a new distance matrix (using graph paths)
+6.	Use the new distance matrix to compute new shortest paths (including waypoints)
+7.	Pass the waypoints to google, to get a new path
+8.	Display the path on a google looking map
+
+Homework:
+CS	-	Continue work for last week
+EF	-	Work using the shapely library to accomplish parts of Step 4
+KK	-	Work on completing Step 8
