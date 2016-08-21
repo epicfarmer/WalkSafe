@@ -1,0 +1,7 @@
+runtime: python
+vm: true
+entryport: gunicoorn -b $PORT walksafe.wsgi
+
+
+runtime_config:
+  python_version: 3
