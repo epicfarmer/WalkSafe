@@ -12,6 +12,7 @@ sys.path.append(os.path.join(HOME, "source"))
 from loadData import loadData, loadRasterData
 import polyline
 from reweightLinelist import reweight_linelist
+from directions import GMAPS_CLIENT
 
 import pprint
 
@@ -21,18 +22,12 @@ DIRECTIONS_URL = 'https://maps.googleapis.com/maps/api/directions/json'
 ORIGIN='615 N Wolfe Street, Baltimore, MD'
 DESTINATION = '501 E Pratt Street, Baltimore, MD'
 
-THE_KEY_FILE = "/Users/Kathryn/Desktop/GoogleMapKey"
+GOOGLE_KEY_FILE = os.path.join(HOME, "data", "google_key")
 BROWSER_KEY = ""
 
-def _api_key():
-    with open(THE_KEY_FILE, 'r') as fh:
-        return fh.read().strip()
 
 def _request_directions():
-    API_KEY = _api_key()
-    gmaps = googlemaps.Client(key=API_KEY)
-
-    geocode_result = gmaps.distance_matrix(['615 N Wolfe Street, Baltimore, MD'],
+    geocode_result = GMAPS_CLIENT.distance_matrix(['615 N Wolfe Street, Baltimore, MD'],
                                            ['501 E Pratt Street, Baltimore, MD', '333 W Camden St, Baltimore, MD'],
                                            mode="walking")
 
@@ -40,10 +35,8 @@ def _request_directions():
 
 
 def _directions(origin, destination):
-    API_KEY = _api_key()
-    gmaps = googlemaps.Client(key=API_KEY)
     # Request directions via public transit
-    return gmaps.directions(origin,
+    return GMAPS_CLIENT.directions(origin,
                                      destination,
                                      mode="walking")
 
