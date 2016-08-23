@@ -4,6 +4,15 @@ from django.http import JsonResponse, HttpResponse
 from django.http import HttpResponseNotFound, HttpResponseBadRequest
 import googlemaps
 
+import sys
+import os.path
+HOME=os.path.join(os.path.dirname(__file__), '../..')
+sys.path.append(os.path.join(HOME, "source"))
+
+from loadData import loadData, loadRasterData
+import polyline
+from reweightLinelist import reweight_linelist
+
 import pprint
 
 DISTANCE_MATRIX_URL ='https://maps.googleapis.com/maps/api/distancematrix/json'
@@ -29,7 +38,8 @@ def _request_directions():
 
     return geocode_result
 
-def directions(origin, destination):
+
+def _directions(origin, destination):
     API_KEY = _api_key()
     gmaps = googlemaps.Client(key=API_KEY)
     # Request directions via public transit
@@ -58,4 +68,18 @@ def index(request):
     if 'origin' not in params.keys() or 'destination' not in params.keys():
         return HttpResponseBadRequest('<h1>Bad Request</h1>origin and destination parameters required')
 
-    return JsonResponse(directions(params['origin'],params['destination']), safe=False)
+
+    directions_result = _directions(params['origin'],params['destination'])
+    points = directions_result[0]['overview_polyline']['points']
+
+    line = polyline.decode(points)
+
+    [crime, xinfo, yinfo] = loadRasterData()
+
+    safety_score = reweight_linelist(line, crime, xinfo, yinfo)
+
+    response = {}
+    response['directions'] = directions_result
+    response['safety_score'] = safety_score
+
+    return JsonResponse(response)

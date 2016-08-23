@@ -5,6 +5,7 @@ import polyline as pl
 import LevelSetEstimation as ls
 import pandas as pd
 import directions as dr
+import os.path
 
 
 def reweight_linelist(linelist,raster,xinfo,yinfo):
@@ -48,35 +49,3 @@ def reweight_distance_matrix(distance_matrix,locations,raster,xinfo,yinfo):
 	#http://igraph.org/python/doc/igraph.Graph-class.html
 	return(distance_matrix,locations)
 #reweight_linelist(dr.directions
-
-	
-
-twopoint = "{cynFjanrMoADoCJqCBoBFsFNaA@{CDsDHE?C?K@eBD"
-#twopoint = dr.directions('615 N Wolfe Street,Baltimore, MD','Fells Point, Baltimore, MD')[0]['overview_polyline']['points']
-line = pl.decode(twopoint)
-try:
-	raster_data = np.load("data/RasterCrimeData.npy")
-	xinfo = np.load("data/xinfoCrimeData.npy")
-	yinfo = np.load("data/yinfoCrimeData.npy")
-except IOError as (errno,strerror):
-	data = pd.read_csv("data/BPD_Part_1_Victim_Based_Crime_Data.csv")
-	latlong_data = data.loc[:,"Location 1"].str.split(',')
-	latlong_data = pd.DataFrame(np.matrix([latlong_data.str[0].str.replace("(",""),latlong_data.str[1].str.replace(")","")]).T,dtype=float)
-	latlong_data.columns = ["y","x"]
-	latlong_data = latlong_data[latlong_data["y"] < 40]
-	year = data.loc[:,"CrimeDate"].str.split('/').str.get(2).astype('float')
-	[raster_data,xinfo,yinfo] = ls.rasterizeData(latlong_data,.005)
-	np.save("data/RasterCrimeData.npy",raster_data,False)
-	np.save("data/xinfoCrimeData.npy",xinfo,False)
-	np.save("data/yinfoCrimeData.npy",yinfo,False)
-
-new_weight = reweight_linelist(line,raster_data,xinfo,yinfo)
-test = sg.LineString(line)
-test.y,test.x = test.xy
-print(sg.LineString(line).length)
-print(new_weight)
-ls.plotRasterData(xinfo,yinfo,raster_data)
-plt.plot(test.x,test.y)
-#plt.show()
-test = np.array([xinfo,yinfo])
-points = test.reshape(2,35*37).T
