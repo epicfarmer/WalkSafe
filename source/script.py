@@ -17,9 +17,11 @@ crime_data = data.loadData()
 [crime,xinfo,yinfo] = data.loadRasterData()
 
 ##Distance Matrix
-[distances,locations]= data.loadDistanceData()
-[distances2,locations2] = rw.reweight_distance_matrix(distances,locations,crime_data,xinfo,yinfo)
+#[distances,locations]= data.loadDistanceData()
+#[distances2,locations2] = rw.reweight_distance_matrix(distances,locations,crime_data,xinfo,yinfo)
+#print(distances,distances2)
 
+path = ""
 
 
 #print(crime)

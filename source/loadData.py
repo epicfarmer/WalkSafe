@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import LevelSetEstimation as ls
 import directions as dr
+import gridBaltimore as gb
+import shapely.geometry as sg
 
 def loadData():
 	data = pd.read_csv("data/BPD_Part_1_Victim_Based_Crime_Data.csv")
@@ -31,7 +33,10 @@ def loadDistanceData():
 		distances = np.load("data/distance_matrix.npy")
 		locations = np.load("data/baltimore_grid.npy")
 	except IOError as (errno,strerror):
-		dr.getDistanceMatrix(100,100)
-		distances = np.load("data/distance_matrix.npy")
-		locations = np.load("data/baltimore_grid.npy")
+		baltimore_grid = gb.getBaltimoreGrid(5,5)
+		baltimore_grid.long,baltimore_grid.lat = sg.asLineString(baltimore_grid).xy
+		locations = np.array([baltimore_grid.lat,baltimore_grid.long]).T
+		distances = dr.distance_matrix(locations)
+		distances = np.save("data/distance_matrix.npy",distances,False)
+		locations = np.save("data/baltimore_grid.npy",locations,False)
 	return(distances,locations)
