@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import polyline as pl
 import LevelSetEstimation as ls
 import pandas as pd
-import directions
+import directions as dr
 
 
 def reweight_linelist(linelist,raster,xinfo,yinfo):
@@ -24,8 +24,35 @@ def smartIntersectLength(linelist,cell):
 		return 0
 	return(linelist.intersection(cell).length)
 
+def compute_closest_points(distance_matrix,locations):
+	#This works because we assume a regularish grid
+	threshold = np.min(distance_matrix[distance_matrix > 0])*1.9
+	closest_pairs = distance_matrix < threshold;
+	closest_pairs[np.tril_indices(closest_pairs.shape[0])] = False
+	closest_pairs = np.array(np.where(closest_pairs)).T
+	return(closest_pairs)
+
+def reweight_distance_matrix(distance_matrix,locations,raster,xinfo,yinfo):
+	numpoints = distance_matrix.shape[0]
+	threshold = 1
+	closest_point_pairs = compute_closest_points(distance_matrix,locations)
+
+	test = np.zeros(distance_matrix.shape);
+	test[:] = np.Inf;
+	for point_pair in closest_point_pairs:
+		tmp = reweight_linelist(sg.LineString(np.array([locations[point_pair[0],],locations[point_pair[1],]])),raster_data,xinfo,yinfo)
+		test[point_pair[0],point_pair[1]] = tmp
+		test[point_pair[1],point_pair[0]] = tmp
+	print(test)
+	#Use igraph to make test into a graph, and then compute the shortest paths
+	#http://igraph.org/python/doc/igraph.Graph-class.html
+	return(distance_matrix,locations)
+#reweight_linelist(dr.directions
+
+	
+
 twopoint = "{cynFjanrMoADoCJqCBoBFsFNaA@{CDsDHE?C?K@eBD"
-twopoint = directions.directions('615 N Wolfe Street,Baltimore, MD','Fells Point, Baltimore, MD')[0]['overview_polyline']['points']
+#twopoint = dr.directions('615 N Wolfe Street,Baltimore, MD','Fells Point, Baltimore, MD')[0]['overview_polyline']['points']
 line = pl.decode(twopoint)
 try:
 	raster_data = np.load("data/RasterCrimeData.npy")

@@ -1,14 +1,35 @@
-import LevelSetEstimation as l
 import numpy as np
+import LevelSetEstimation as lse
+import directions as dr
+import gridBaltimore as gb
+import loadData as data
+#import gridIntersect as gi
+import reweightLinelist as rw
 
-data = l.getTestData(10000);
-data[:5000]['x'] += 1
-data[:1000]['x'] += 1
-data[4000:6000]['x'] += 1
-data[5000:7000]['y'] += 1
-l.plotData(data);
-print(1./np.sqrt(np.sqrt(10000)))
-raster = l.rasterizeData(data,.5);
-l.plotRasterData(raster);
-mask = l.estimateBoundary(raster,.1,10000);
-l.plotRasterData(mask);
+
+
+##Crime Map Estimation
+
+crime_data = data.loadData()
+
+##In theory, analysis should go here, but for now...
+
+[crime,xinfo,yinfo] = data.loadRasterData()
+
+##Distance Matrix
+[distances,locations]= data.loadDistanceData()
+[distances2,locations2] = rw.reweight_distance_matrix(distances,locations,crime_data,xinfo,yinfo)
+
+
+
+#print(crime)
+#print(crime_data)
+#print(distances)
+#print(locations)
+
+
+
+#distances = np.array([[0,1],[1,0]])
+
+## function not yet written :(
+#distances = reweight_distance_matrix(distances,locations,crime)
