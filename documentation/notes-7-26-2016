@@ -1,0 +1,32 @@
+Big Picture:
+	Devices
+		Webserver
+		Phone
+	Workflow:
+		Phone sends coords to webserver
+		Webserver computes weighted shortest path
+		Webserver sends series of waypoints back to phone
+		Phone looks up on google
+	
+Webserver Functions:
+	getDirections(start,end)
+	shortestPath(start,end,matrix)
+	getDistanceMatrix()
+	reweightDistanceMatrix(matrix)
+	passToPhone()
+	getFromPhone()
+	beServer()
+Phone:
+	passToWebserver()
+	displayToUser()
+	getFromWebserver()
+
+Homework:
+	KK: put in skeleton for path computation,API documentation
+	EF: Clean up all the existing code, get function to do shortest path, get points for distance matrix
+	CC: Work on passing waypoints to the navigation app pass the path key to the navigation app
+	CS: Think about better ways to estimate probability
+
+Sent from my iPhone 3G
+You should try that peanut butter
+

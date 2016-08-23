@@ -16,7 +16,7 @@ def reweight_linelist(linelist,raster,xinfo,yinfo):
 			square = sg.Polygon([(yinfo[row,col],xinfo[row,col]),(yinfo[row+1,col],xinfo[row+1,col]),(yinfo[row+1,col+1],xinfo[row+1,col+1]),(yinfo[row,col+1],xinfo[row,col+1])])
 			length = smartIntersectLength(path,square)
 			if(length > 0):
-				ans = ans + raster[row,col]*length
+				ans = ans + (raster[row,col])*length
 	return(ans)
 
 def smartIntersectLength(linelist,cell):
@@ -25,7 +25,7 @@ def smartIntersectLength(linelist,cell):
 	return(linelist.intersection(cell).length)
 
 twopoint = "{cynFjanrMoADoCJqCBoBFsFNaA@{CDsDHE?C?K@eBD"
-twopoint = directions.directions('615 N Wolfe Street,Baltimore, MD','333 W Camden St, Baltimore, MD')[0]['overview_polyline']['points']
+twopoint = directions.directions('615 N Wolfe Street,Baltimore, MD','Fells Point, Baltimore, MD')[0]['overview_polyline']['points']
 line = pl.decode(twopoint)
 try:
 	raster_data = np.load("data/RasterCrimeData.npy")
@@ -39,11 +39,17 @@ except IOError as (errno,strerror):
 	latlong_data = latlong_data[latlong_data["y"] < 40]
 	year = data.loc[:,"CrimeDate"].str.split('/').str.get(2).astype('float')
 	[raster_data,xinfo,yinfo] = ls.rasterizeData(latlong_data,.005)
-	print(xinfo)
 	np.save("data/RasterCrimeData.npy",raster_data,False)
 	np.save("data/xinfoCrimeData.npy",xinfo,False)
 	np.save("data/yinfoCrimeData.npy",yinfo,False)
 
 new_weight = reweight_linelist(line,raster_data,xinfo,yinfo)
+test = sg.LineString(line)
+test.y,test.x = test.xy
 print(sg.LineString(line).length)
 print(new_weight)
+ls.plotRasterData(xinfo,yinfo,raster_data)
+plt.plot(test.x,test.y)
+#plt.show()
+test = np.array([xinfo,yinfo])
+points = test.reshape(2,35*37).T
