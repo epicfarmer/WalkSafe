@@ -5,6 +5,7 @@ import polyline as pl
 import LevelSetEstimation as ls
 import pandas as pd
 import directions as dr
+import os.path
 
 
 def reweight_linelist(linelist,raster,xinfo,yinfo):

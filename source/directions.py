@@ -5,15 +5,17 @@ import time
 import gridBaltimore as gb
 import shapely.geometry as sg
 
+import os.path
+
 #Get key to use googlemaps from file
-def api_key():
-	with open('/home/jkaminsky/google_key', 'r') as fh:
-		return fh.read().strip()
-try:
-	API_KEY = api_key()
-	gmaps = googlemaps.Client(key=API_KEY)
-except:
-	print("google api not working")
+def _init_api_key():
+    key_file = os.path.join(os.path.dirname(__file__), "../data/google_key")
+    print key_file
+    with open(key_file, 'r') as fh:
+        return fh.read().strip()
+
+API_KEY = _init_api_key()
+GMAPS_CLIENT = googlemaps.Client(key=API_KEY)
 
 #Get directions from one location to another location
 #input:
@@ -23,8 +25,8 @@ except:
 #output:
 #		(list:dict:various) the directions from google.  For our purposes, output[0]['overview_polyline']['points'] is a list of tuples of latlong coordinates
 def directions(origin, destination):
-	# Request walking directions via public transit
-	directions_result = gmaps.directions(origin,destination,mode="walking")
+    # Request walking directions via public transit
+	directions_result = GMAPS_CLIENT.directions(origin,destination,mode="walking")
 	return(directions_result)
 
 #Get distance 'matrix' between a set of locations
@@ -44,7 +46,7 @@ def distance_matrix(locations):
 			#print(from_matrix.shape[0])
 			#print(to_matrix.shape[0])
 			try:
-				geocode_result = gmaps.distance_matrix(from_matrix,to_matrix,mode="walking")
+				geocode_result = GMAPS_CLIENT.distance_matrix(from_matrix,to_matrix,mode="walking")
 			except googlemaps.exceptions.Timeout:
 				return(output)
 			print(i,j)
@@ -65,7 +67,7 @@ def distance_matrix(locations):
 #output:
 #	a numpy array
 def assymetric_distance_matrix(to_locations,from_locations):
-	geocode_result = gmaps.distance_matrix(from_locations,to_locations,mode="walking")
+	geocode_result = GMAPS_CLIENT.distance_matrix(from_locations,to_locations,mode="walking")
 	#except googlemaps.exceptions.Timeout:
 	output=np.zeros([len(from_locations),len(to_locations)],np.float32)
 	for i in range(len(from_locations)):
@@ -133,7 +135,7 @@ def refining_baltimore_distance_matrix():
 			#print(from_matrix.shape[0])
 			#print(to_matrix.shape[0])
 			try:
-				geocode_result = gmaps.distance_matrix(from_matrix,to_matrix,mode="walking")
+				geocode_result = GMAPS_CLIENT.distance_matrix(from_matrix,to_matrix,mode="walking")
 			except googlemaps.exceptions.Timeout:
 				np.save('data/baltimore_grid',test1,baltimore_grid)
 				np.save('data/temp_distance_matrix.npy',old_matrix)
