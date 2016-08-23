@@ -3,6 +3,7 @@ import LevelSetEstimation as lse
 import directions as dr
 import gridBaltimore as gb
 import loadData as data
+import polyline as pl
 #import gridIntersect as gi
 import reweightLinelist as rw
 
@@ -21,7 +22,12 @@ crime_data = data.loadData()
 #[distances2,locations2] = rw.reweight_distance_matrix(distances,locations,crime_data,xinfo,yinfo)
 #print(distances,distances2)
 
-path = ""
+twopoint = "{cynFjanrMoADoCJqCBoBFsFNaA@{CDsDHE?C?K@eBD"
+line = pl.decode(twopoint)
+
+safety_score = rw.reweight_linelist(line,crime,xinfo,yinfo)
+
+print(safety_score)
 
 
 #print(crime)
