@@ -1,0 +1,15 @@
+Notes:
+	Progress:
+		GPS coordinates
+		Distance Matrix (non-updating)
+	Plan:
+		Put web repository online
+		Update Distance Matrix
+		Do our own paths
+		Set up Server
+		Smarter Crime Estimation
+
+Next Time:
+	CC: Figure out interactions with google maps app
+	EF: Get the distance matrix to update over multiple days
+	KK:	Score a path based on call

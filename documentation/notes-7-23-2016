@@ -1,0 +1,32 @@
+We have a web service powered by django that takes an origin and destination and returns a path with a safety score (the path comes from google).
+To run this service from the root:
+	edit source/directions.py to use your google key
+	cd web
+	edit views.py to use your google key
+	python manage.py runserver
+	direct a web browser to 127.0.0.1:8000/directionsWithScores?origin=<origin>&destination=<destination>
+	<origin> and <destination> are anything you can type into google maps
+	returns a json containing a dictionary with the following key/vals
+		directions: The normal google result
+		safety_score: our safety score for the route, which is weighted by length, and crime.
+
+The workhorse method for the web service is index() in views.py.
+
+#TODO:
+(KK)	fix the freaking google key storage system
+		Idea: make a file which stores the key, but isn't versioned 
+		data/google_key
+(KK)	get the function to calculate and reweight the distance matrix taking into account limited queries to googlemaps api
+(EF)	Calculate safety_score in a smarter way than using the empirical distribution
+(KK)	see if some functions can be moved from web/views.py to source/directions.py
+(CC)	interface phone app with web service and display route and safety score.
+(EF)	clean up source directory
+ALL	comment code...
+
+For next time:
+	fix the key storage and clean up and comment
+	come up with a plan for safety_score (and implement?)
+
+Prospective agenda for next time:
+	Get a phone to interface with our api
+	everyone explain their bit to everyone else
