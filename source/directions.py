@@ -90,10 +90,10 @@ def baltimore_distance_matrix(xbins,ybins):
 	baltimore_grid = gb.getBaltimoreGrid(xbins,ybins)
 	baltimore_grid.long,baltimore_grid.lat = sg.asLineString(baltimore_grid).xy
 	locations = np.array([baltimore_grid.lat,baltimore_grid.long]).T
-	distances = distance_matrix(test1)
+	distances = distance_matrix(locations)
 	np.save('data/distance_matrix',distances)
 	np.save('data/baltimore_grid',locations)
-	return([test2,test1])
+	return([distances,locations])
 
 #Get distance matrix over all of baltimore which refines and updates over time
 #input:
@@ -169,23 +169,3 @@ def refining_baltimore_distance_matrix():
 	#np.save('data/distance_matrix',output)
 	#np.save('data/baltimore_grid',baltimore_grid)
 	return(output)
-<<<<<<< HEAD
-=======
-
-
-#DISTANCE_MATRIX_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json'
-#DIRECTIONS_URL = 'https://maps.googleapis.com/maps/api/directions/json'
-#
-#locations = [
-#	'615 N Wolfe Street, Baltimore, MD',
-#	'501 E Pratt Street, Baltimore, MD',
-#	'333 W Camden St, Baltimore, MD',
-#	'1876 Mansion House Drive Druid Hill Park,, 1876 Mansion House Dr, Baltimore, MD 21217'
-#]
-#
-#i=0
-#j=1
-#print(len(locations))
-#print(distance_matrix(locations))
-#print(distance_matrix(locations)['rows'][i]['elements'][j]['distance']['value'])
->>>>>>> acd4547f7787c88d1ddff1a07d5fc124a2fb27be
