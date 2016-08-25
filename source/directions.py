@@ -10,10 +10,9 @@ import os.path
 
 #Get key to use googlemaps from file
 def _init_api_key():
-    key_file = os.path.join(os.path.dirname(__file__), "../data/google_key")
-    print key_file
-    with open(key_file, 'r') as fh:
-        return fh.read().strip()
+	key_file = os.path.join(os.path.dirname(__file__), "../data/google_key")
+	with open(key_file, 'r') as fh:
+		return fh.read().strip()
 
 API_KEY = _init_api_key()
 GMAPS_CLIENT = googlemaps.Client(key=API_KEY)
@@ -25,9 +24,9 @@ GMAPS_CLIENT = googlemaps.Client(key=API_KEY)
 #output:
 #		(list:dict:various) the directions from google.  For our purposes, output[0]['overview_polyline']['points'] is a list of tuples of latlong coordinates
 def directions(origin, destination):
-    # Request walking directions via public transit
+	# Request walking directions via public transit
 	directions_result = GMAPS_CLIENT.directions(origin,destination,mode="walking")
-	return(directions_result)
+	return directions_result
 
 #Get distance 'matrix' between a set of locations
 #input:
@@ -103,9 +102,10 @@ def baltimore_distance_matrix(xbins,ybins):
 #distances	a numpy array where (i,j)th entry is the distance from from_locations[i] to to_locations[j]
 def refining_baltimore_distance_matrix():
 	try:
-		baltimore_grid = np.load('data/baltimore_grid.npy',test1)
+		baltimore_grid = np.load('data/baltimore_grid.npy')
 		old_matrix = np.load('data/temp_distance_matrix.npy')
 	except:
+		print('creating new matrix')
 		[old_matrix,baltimore_grid] = baltimore_distance_matrix(3,3)
 	latitudes,longitudes = sg.asLineString(baltimore_grid).xy
 	locations = np.array([latitudes,longitudes]).T
@@ -116,9 +116,9 @@ def refining_baltimore_distance_matrix():
 		new_baltimore_grid = gb.getBaltimoreGrid(new_xbins,new_ybins)
 		new_baltimore_grid.long,new_baltimore_grid.lat = sg.asLineString(new_baltimore_grid).xy
 		new_locations = np.array([new_baltimore_grid.lat,new_baltimore_grid.long]).T
-		
+
 		a = np.tile(locations,[new_locations.shape[0],new_locations.shape[1],1,1])
-		
+
 		print(a.shape,locations.shape,new_locations.shape)
 		#b = np.tile(new_locations,[1,1,locations.shape[0],locations.shape[1]])
 		#output = np.zeros([new_locations.shape[0],new_locations.shape[0]],np.float32)*np.nan
@@ -169,3 +169,23 @@ def refining_baltimore_distance_matrix():
 	#np.save('data/distance_matrix',output)
 	#np.save('data/baltimore_grid',baltimore_grid)
 	return(output)
+<<<<<<< HEAD
+=======
+
+
+#DISTANCE_MATRIX_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json'
+#DIRECTIONS_URL = 'https://maps.googleapis.com/maps/api/directions/json'
+#
+#locations = [
+#	'615 N Wolfe Street, Baltimore, MD',
+#	'501 E Pratt Street, Baltimore, MD',
+#	'333 W Camden St, Baltimore, MD',
+#	'1876 Mansion House Drive Druid Hill Park,, 1876 Mansion House Dr, Baltimore, MD 21217'
+#]
+#
+#i=0
+#j=1
+#print(len(locations))
+#print(distance_matrix(locations))
+#print(distance_matrix(locations)['rows'][i]['elements'][j]['distance']['value'])
+>>>>>>> acd4547f7787c88d1ddff1a07d5fc124a2fb27be
