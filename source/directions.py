@@ -5,6 +5,7 @@ import time
 import gridBaltimore as gb
 import shapely.geometry as sg
 
+import sys
 import os.path
 
 #Get key to use googlemaps from file
@@ -19,7 +20,6 @@ GMAPS_CLIENT = googlemaps.Client(key=API_KEY)
 
 #Get directions from one location to another location
 #input:
-	#JK: list of strings? unknown
 #	origin	(string)	name of place to travel from
 #	destination	(string)	name of place to travel to
 #output:
@@ -33,39 +33,40 @@ def directions(origin, destination):
 #input:
 #	locations	(list:string)	names of locations to get distances among
 #output:
-#	a numpy array
+#	a numpy array where (i,j)th entry is the distance from locations[i] to locations[j]
 def distance_matrix(locations):
 	output=np.zeros([len(locations),len(locations)],np.float32)*np.nan
 	from_matrix = np.zeros([5,2])
 	to_matrix = np.zeros([5,2])
+	#for each disjoint 5x5 submatrix
 	for i in np.arange(0,len(locations),5):
 		from_matrix = locations[i:i+5,:]
 		for j in np.arange(0,len(locations),5):
 			to_matrix = locations[j:j+5,:]
-			#print("Here")
-			#print(from_matrix.shape[0])
-			#print(to_matrix.shape[0])
+			#try to compute the distance on that
 			try:
 				geocode_result = GMAPS_CLIENT.distance_matrix(from_matrix,to_matrix,mode="walking")
 			except googlemaps.exceptions.Timeout:
+				#return what you have if google hates you
 				return(output)
-			print(i,j)
-			time.sleep(1)
-			#print(output)
+			#if it worked, turn it into a numpy matrix
 			for k in np.arange(from_matrix.shape[0]):
 				for l in np.arange(to_matrix.shape[0]):
 					if(geocode_result['rows'][k]['elements'][l]['status'] == 'OK'):
 						output[i+k,j+l] = geocode_result['rows'][k]['elements'][l]['distance']['value']
 					else:
-						print(geocode_result['rows'][i+k]['elements'][j+l])
+						sys.stderr.write("The output matrix is not well formed")
 						output[i+k,j+l] = np.nan
+			#google has a limited number of queries per second, so we sleep
+			time.sleep(1)
 	return(output)
 
-#Get distance 'matrix' between a set of locations
+#Get distance matrix between a set of locations
 #input:
-#	locations	(list:string)	names of locations to get distances among
+#	to_locations   (list:string)	names of locations to get distances to
+#	from_locations (list:string)	names of locations to get distances from
 #output:
-#	a numpy array
+#	a numpy array where (i,j)th entry is the distance from from_locations[i] to to_locations[j]
 def assymetric_distance_matrix(to_locations,from_locations):
 	geocode_result = GMAPS_CLIENT.distance_matrix(from_locations,to_locations,mode="walking")
 	#except googlemaps.exceptions.Timeout:
@@ -79,15 +80,27 @@ def assymetric_distance_matrix(to_locations,from_locations):
 				output[i,j] = np.nan
 	return(output)
 
+#Get distance matrix over all of baltimore
+#input:
+#	x_bins (integer)	number of columns in the grid to overlay on baltimore
+#	y_bins (integer)	number of rows in the grid to overlay on baltimore
+#output:
+#locations	a set of (longitude,latitude) pairs for locations given by the grid defined by x_bins and y_bins (see getBaltimoreGrid. in source/gridBaltimore.py)
+#distances	a numpy array where (i,j)th entry is the distance from from_locations[i] to to_locations[j]
 def baltimore_distance_matrix(xbins,ybins):
 	baltimore_grid = gb.getBaltimoreGrid(xbins,ybins)
 	baltimore_grid.long,baltimore_grid.lat = sg.asLineString(baltimore_grid).xy
-	test1 = np.array([baltimore_grid.lat,baltimore_grid.long]).T
-	test2 = distance_matrix(test1)
-	np.save('data/distance_matrix',test2)
-	np.save('data/baltimore_grid',test1)
+	locations = np.array([baltimore_grid.lat,baltimore_grid.long]).T
+	distances = distance_matrix(test1)
+	np.save('data/distance_matrix',distances)
+	np.save('data/baltimore_grid',locations)
 	return([test2,test1])
 
+#Get distance matrix over all of baltimore which refines and updates over time
+#input:
+#output:
+#locations	a set of (longitude,latitude) pairs for locations given by the grid defined by x_bins and y_bins (see getBaltimoreGrid. in source/gridBaltimore.py)
+#distances	a numpy array where (i,j)th entry is the distance from from_locations[i] to to_locations[j]
 def refining_baltimore_distance_matrix():
 	try:
 		baltimore_grid = np.load('data/baltimore_grid.npy',test1)
@@ -156,20 +169,3 @@ def refining_baltimore_distance_matrix():
 	#np.save('data/distance_matrix',output)
 	#np.save('data/baltimore_grid',baltimore_grid)
 	return(output)
-		
-	
-#DISTANCE_MATRIX_URL = 'https://maps.googleapis.com/maps/api/distancematrix/json'
-#DIRECTIONS_URL = 'https://maps.googleapis.com/maps/api/directions/json'
-#
-#locations = [
-#	'615 N Wolfe Street, Baltimore, MD',
-#	'501 E Pratt Street, Baltimore, MD',
-#	'333 W Camden St, Baltimore, MD',
-#	'1876 Mansion House Drive Druid Hill Park,, 1876 Mansion House Dr, Baltimore, MD 21217'
-#]
-#
-#i=0
-#j=1
-#print(len(locations))
-#print(distance_matrix(locations))
-#print(distance_matrix(locations)['rows'][i]['elements'][j]['distance']['value'])
