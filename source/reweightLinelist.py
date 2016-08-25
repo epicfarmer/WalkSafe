@@ -42,7 +42,7 @@ def smartIntersectLength(linelist,cell):
 
 #given a distance matrix, return all pairs of near neighbors
 #input:
-#	locations	(numpy array) x and y coordinates for the points.  These should be 
+#	locations	(numpy array) x and y coordinates for the points.
 #	distance_matrix (numpy array) the reference for the distances
 def compute_closest_points(distance_matrix,locations):
 	#This works because we assume a regularish grid
@@ -54,6 +54,13 @@ def compute_closest_points(distance_matrix,locations):
 	closest_pairs = np.array(np.where(closest_pairs)).T
 	return(closest_pairs)
 
+#incomplete
+#Rescale an entire distance matrix using a heat map
+#	distance_matrix(result of polyline.decode) The distance matrix to reweight
+#	locations	(numpy array) x and y coordinates for the points.
+#	raster_data (numpy array) Values of the heatmap
+#	xinfo (numpy array) associated longitude coordinates
+#	yinfo (numpy array) associated latitude coordinates
 def reweight_distance_matrix(distance_matrix,locations,raster_data,xinfo,yinfo):
 	numpoints = distance_matrix.shape[0]
 	threshold = 1
