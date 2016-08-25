@@ -11,20 +11,33 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "../data")
 #This method will load the file data/BPD_Part_1_Victim_Based_Crime_Data.csv
 def loadBPD_Crime_Data():
 	data = pd.read_csv(os.path.join(DATA_DIR, "BPD_Part_1_Victim_Based_Crime_Data.csv"))
-	#data['CrimeDate']:
-
+	data['CrimeDateTime'] = pd.to_datetime(data['CrimeDate'].values + " " + data['CrimeTime'].values)
+	#Note: to get a particular aspect of time, use a call such as
+	#data['year'] = data['CrimeDateTime'].dt.year
+	data['severity'] = pd.to_numeric(data['CrimeCode'].str[0])
+	latlong_data = data.loc[:,"Location 1"].str.split(',')
+	latlong_data = pd.DataFrame(np.matrix([latlong_data.str[0].str.replace("(",""),latlong_data.str[1].str.replace(")","")]).T,dtype=float)
+	latlong_data.columns = ["y","x"]
+	data['x'] = latlong_data['x']
+	data['y'] = latlong_data['y']
+	data = data[data['y'] < 40]
+	data = data[['CrimeDateTime','severity','x','y','Total Incidents']]
+	return(data)
+	
+#loadBPD_Crime_Data()
 #CrimeDate,CrimeTime,CrimeCode,Location,Description,Weapon,Post,District,Neighborhood,Location 1,Total Incidents
 #05/28/2016,00:00:00,6E,2700 HARLEM AVE,LARCENY,,721,WESTERN,Mosher,"(39.2955200000, -76.6624700000)",1
 	
 
 #This method partially loads the file data/BPD_Part_1_Victim_Based_Crime_Data.csv. It only loads the latitudes and longitudes for each crime
 def loadData():
-	data = pd.read_csv(os.path.join(DATA_DIR, "BPD_Part_1_Victim_Based_Crime_Data.csv"))
-	latlong_data = data.loc[:,"Location 1"].str.split(',')
-	latlong_data = pd.DataFrame(np.matrix([latlong_data.str[0].str.replace("(",""),latlong_data.str[1].str.replace(")","")]).T,dtype=float)
-	latlong_data.columns = ["y","x"]
-	latlong_data = latlong_data[latlong_data["y"] < 40]
-	year = data.loc[:,"CrimeDate"].str.split('/').str.get(2).astype('float')
+	latlong_data = loadBPD_Crime_Data()[['x','y']]
+	#data = pd.read_csv(os.path.join(DATA_DIR, "BPD_Part_1_Victim_Based_Crime_Data.csv"))
+	#latlong_data = data.loc[:,"Location 1"].str.split(',')
+	#latlong_data = pd.DataFrame(np.matrix([latlong_data.str[0].str.replace("(",""),latlong_data.str[1].str.replace(")","")]).T,dtype=float)
+	#latlong_data.columns = ["y","x"]
+	#latlong_data = latlong_data[latlong_data["y"] < 40]
+	#year = data.loc[:,"CrimeDate"].str.split('/').str.get(2).astype('float')
 	return latlong_data
 
 #This method loads the rasterized crime data. The data is rasterized at a scale of .005 degrees.  (That is, the histogram bins are .005 latitude by .005 longitude)
