@@ -10,7 +10,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "../data")
 
 #This method will load the file data/BPD_Part_1_Victim_Based_Crime_Data.csv
 def loadBPD_Crime_Data():
-	data = pd.read_csv(os.path.join(DATA_DIR, "/BPD_Part_1_Victim_Based_Crime_Data.csv"))
+	data = pd.read_csv(os.path.join(DATA_DIR, "BPD_Part_1_Victim_Based_Crime_Data.csv"))
 	#data['CrimeDate']:
 
 #CrimeDate,CrimeTime,CrimeCode,Location,Description,Weapon,Post,District,Neighborhood,Location 1,Total Incidents
@@ -19,7 +19,7 @@ def loadBPD_Crime_Data():
 
 #This method partially loads the file data/BPD_Part_1_Victim_Based_Crime_Data.csv. It only loads the latitudes and longitudes for each crime
 def loadData():
-	data = pd.read_csv(os.path.join(DATA_DIR, "/BPD_Part_1_Victim_Based_Crime_Data.csv"))
+	data = pd.read_csv(os.path.join(DATA_DIR, "BPD_Part_1_Victim_Based_Crime_Data.csv"))
 	latlong_data = data.loc[:,"Location 1"].str.split(',')
 	latlong_data = pd.DataFrame(np.matrix([latlong_data.str[0].str.replace("(",""),latlong_data.str[1].str.replace(")","")]).T,dtype=float)
 	latlong_data.columns = ["y","x"]

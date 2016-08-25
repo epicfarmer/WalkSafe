@@ -44,12 +44,14 @@ def smartIntersectLength(linelist,cell):
 #given a distance matrix, return all pairs of near neighbors
 #input:
 #	locations	(numpy array) x and y coordinates for the points.  These should be 
-#	distance_matrix
+#	distance_matrix (numpy array) the reference for the distances
 
-def compute_closest_points(distance_matrix,locations,scale=2*np.min(distance_matrix)):
+def compute_closest_points(distance_matrix,locations):
 	#This works because we assume a regularish grid
+	#In general, the nearby points are the ones which are closer than twice the minimum distance in the grid
 	threshold = np.min(distance_matrix[distance_matrix > 0])*1.9
 	closest_pairs = distance_matrix < threshold;
+	#This is just a fancy thing to get rid of duplicates due to symmetry
 	closest_pairs[np.tril_indices(closest_pairs.shape[0])] = False
 	closest_pairs = np.array(np.where(closest_pairs)).T
 	return(closest_pairs)
