@@ -1,6 +1,6 @@
 import numpy as np
 import LevelSetEstimation as lse
-import directions as dr
+import gmapsRequest as dr
 import gridBaltimore as gb
 import loadData as data
 import polyline as pl

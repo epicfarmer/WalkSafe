@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import polyline as pl
 import LevelSetEstimation as ls
 import pandas as pd
-import directions as dr
+import gmapsRequest as dr
 import os.path
 
 #takes a google maps path and reweights it according to a heatmap

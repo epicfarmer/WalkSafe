@@ -57,7 +57,7 @@ def rasterizeData(data,binSize):
 	xbins = int(np.ceil((xmax-xmin)/binSize));
 	ybins = int(np.ceil((ymax-ymin)/binSize));
 	raster = np.zeros([ybins,xbins],np.float32);
-	print np.shape(data)[0]
+	print(np.shape(data)[0])
 	#Vectorize this
 	for i in range((np.shape(data))[0]):
 		row = data.iloc[i,:];

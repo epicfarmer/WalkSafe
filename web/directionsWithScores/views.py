@@ -9,7 +9,7 @@ sys.path.append(settings.SOURCE_DIR)
 from loadData import loadRasterData
 import polyline
 from reweightLinelist import reweight_linelist
-import directions
+import gmapsRequest
 
 
 GOOGLE_KEY_FILE = os.path.join(settings.DATA_DIR, "google_key")
@@ -42,7 +42,7 @@ def directions_with_scores(request):
 		return HttpResponseBadRequest('<h1>Bad Request</h1>origin and destination parameters required')
 
 	# get directions
-	directions_result = directions.directions(params['origin'], params['destination'])
+	directions_result = gmapsRequest.directions(params['origin'], params['destination'])
 	points = directions_result[0]['overview_polyline']['points']
 
 	# calculate the safety_score

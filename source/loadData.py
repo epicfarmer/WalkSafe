@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import LevelSetEstimation as ls
-import directions as dr
+import gmapsRequest as dr
 import gridBaltimore as gb
 import shapely.geometry as sg
 import os.path
