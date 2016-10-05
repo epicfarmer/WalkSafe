@@ -151,9 +151,8 @@ def refining_baltimore_distance_matrix():
 	return(output)
 
 
-import matplotlib.pyplot as plt
-
 if __name__ == '__main__':
+	import matplotlib.pyplot as plt
 	nbins = 1
 	processed = []
 	while nbins < 4:
