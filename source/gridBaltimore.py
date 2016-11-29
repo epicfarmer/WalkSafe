@@ -4,6 +4,8 @@ import numpy as np
 
 import os.path
 
+
+
 # returns a Polygon (see shapely.geometry.Polygon) of Baltimore
 def baltimore_grid():
 	# fiona_obj = fiona.open("data/Baltimore City Line/geo_export_3fc95e5f-74e6-4614-ab5d-bb96b8ed773d.shp")
@@ -19,7 +21,17 @@ def baltimore_grid():
 # shapely.geometry.Polygon of Baltimore
 _BALTIMORE_GRID = baltimore_grid()
 
+LON_MIN = np.min(_BALTIMORE_GRID.exterior.xy[0])
+LON_MAX = np.max(_BALTIMORE_GRID.exterior.xy[0])
+LAT_MIN = np.min(_BALTIMORE_GRID.exterior.xy[1])
+LAT_MAX = np.max(_BALTIMORE_GRID.exterior.xy[1])
+
+# assumes lat, lon coordinate
 def within(point):
+	assert(len(point) == 2)
+	point = [point[1], point[0]]
+	if not hasattr(point, '_geom'):
+		point = sg.Point(point)
 	return _BALTIMORE_GRID.contains(point)
 
 # returns a MultiPoint object (see shapely.geometry.Multipoint) containing the points in an appropriate grid with x_bins rows and y_bins columns.
