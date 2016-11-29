@@ -1,0 +1,3 @@
+*.pyc
+data/google_key
+web/db.sqlite3
