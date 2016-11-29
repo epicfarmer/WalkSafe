@@ -1,5 +1,5 @@
-Kathryn - Distance Matrix - can generate points and format into matrices. Need to do parse of result and storage. Start and stop.
-Chris - WebView
+Kathryn - Distance Matrix - can generate points and format into distance matrix request. Need to do parse of result and storage. Start and stop. Maybe 6 more hours?
+Chris - woo! web request! View normal GoogleMaps things.
 Josh - 
 
 
