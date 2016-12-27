@@ -1,6 +1,5 @@
 import numpy as np
 import shapely.geometry as sg
-import matplotlib.pyplot as plt
 import polyline as pl
 import LevelSetEstimation as ls
 import pandas as pd

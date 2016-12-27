@@ -1,3 +1,6 @@
+import django
+django.setup()
+
 import numpy as np
 import gmapsRequest as gRequest
 import gridBaltimore
@@ -5,19 +8,24 @@ import itertools
 import heapq
 import pickle
 import time
+import datetime
+
+import decimal
+
+from directionsWithScores.models import Distance, Coordinates
 
 
 class DistanceMatrixRequest:
 
 	def __init__(self, p1, p2s=list()):
 
-		assert(len(p1) == 2)
+		assert(isinstance(p1, Coordinates))
 		assert(gridBaltimore.within(p1))
 		self._point1 = p1
 
 		assert(len(p2s) <= 25)
 		for p2 in p2s:
-			assert(len(p) == 2)
+			assert(isinstance(p2, Coordinates))
 			assert(gridBaltimore.within(p2))
 		self._points2 = p2s
 
@@ -41,15 +49,27 @@ class DistanceMatrixRequest:
 		# googlemaps.exceptions.ApiError: INVALID_REQUEST
 		assert(len(self._points2) <= 25)
 		assert(len(self._points2) >= 1)
+		axis1 = [self._point1.lat, self._point1.lon]
+		axis2 = []
+
 		print('Requesting distance matrix for')
-		print (self._point1, self._points2)
-		self._results = gRequest.distance_matrix([self._point1], self._points2)
+		print (axis1, axis2)
+
+		for c in self._points2:
+			axis2.append((c.lat, c.lon))
+		self._results = gRequest.distance_matrix(axis1, axis2)
 
 		for r in self._results['rows']:
-			for e in r['elements']:
-				duration = e['duration']['value'] # in seconds
-				distance = e['distance']['value'] # in meters
-				status = e['status'] # Possibilities: OK or ZERO_RESULTS
+			src = Coordinates(lat=self._point1[0], lon=self._point1[1])
+			for idx, e in enumerate(r['elements']):
+				point2 = self._points2[idx]
+				dst = Coordinates(lat=point2[0], lon=point2[1])
+				distance = Distance(src_coords=src,
+						 dst_coords=dst,
+						 duration=e['duration']['value'],
+						 distance=e['distance']['value'],
+						 status=e['status'])
+				distance.save()
 
 		return self._results
 
@@ -96,13 +116,30 @@ def baltimore_distance_matrix():
 	new_lat = [gridBaltimore.LAT_MIN, gridBaltimore.LAT_MAX]
 
 	while True:
+		decimal.getcontext().prec = 7
+
 		new_points = []
 		for new_point in itertools.product(new_lat, old_lon):
-			new_points.append(new_point)
+			print("1", new_point)
+			new_coords = Coordinates.objects.get_or_create(lat=decimal.Decimal(new_point[0]),
+														   lon=decimal.Decimal(new_point[1]),
+														   defaults={'update_date':datetime.datetime.now()})
+			new_coords.save()
+			new_points.append(new_coords)
 		for new_point in itertools.product(old_lat, new_lon):
-			new_points.append(new_point)
+			print("2", new_point)
+			new_coords = Coordinates.objects.get_or_create(lat=decimal.Decimal(new_point[0]),
+														   lon=decimal.Decimal(new_point[1]),
+														   defaults={'update_date': datetime.datetime.now()})
+			new_coords.save()
+			new_points.append(new_coords)
 		for new_point in itertools.product(new_lat, new_lon):
-			new_points.append(new_point)
+			print("3", new_point)
+			new_coords = Coordinates.objects.get_or_create(lat=decimal.Decimal(str(new_point[0])),
+														   lon=decimal.Decimal(str(new_point[1])),
+														   defaults={'update_date': datetime.datetime.now()})
+			#3 (39.197233450625134, -76.711293669970274)
+			new_points.append(new_coords)
 
 		print("NEW POINTS:", len(new_points))
 		print("OLD LON:", len(old_lon))
@@ -240,7 +277,7 @@ def process_result(request_result):
 
 
 if __name__ == '__main__':
-	import matplotlib.pyplot as plt
+	#import matplotlib.pyplot as plt
 
 	num_points = 0
 	points = set()

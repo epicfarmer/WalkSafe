@@ -4,6 +4,7 @@ import numpy as np
 
 import os.path
 
+from directionsWithScores.models import Coordinates
 
 
 # returns a Polygon (see shapely.geometry.Polygon) of Baltimore
@@ -28,6 +29,11 @@ LAT_MAX = np.max(_BALTIMORE_GRID.exterior.xy[1])
 
 # assumes lat, lon coordinate
 def within(point):
+	if isinstance(point, Coordinates):
+		p = [point.lat, point.lon]
+		point = p
+	print(point)
+
 	assert(len(point) == 2)
 	point = [point[1], point[0]]
 	if not hasattr(point, '_geom'):

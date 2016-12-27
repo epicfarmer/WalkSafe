@@ -7,7 +7,11 @@ class Coordinates(models.Model):
 	# six decimal places is enough for 10cm accuracy
 	lat = models.DecimalField(max_digits=9, decimal_places=7)
 	lon = models.DecimalField(max_digits=10, decimal_places=7)
-	update_date = models.DateTimeField('date last updated')
+	update_date = models.DateTimeField('date last updated', auto_now=True)
+
+	class Meta:
+		unique_together = ("lat", "lon")
+		index_together = ("lat", "lon")
 
 
 class Distance(models.Model):
@@ -17,3 +21,7 @@ class Distance(models.Model):
 	distance = models.PositiveIntegerField()
 	duration = models.DurationField()  # With SQLite, big int field in microseconds
 	update_date = models.DateTimeField('date last updated')
+
+	class Meta:
+		unique_together = ("src", "dst")
+		index_together = ("src", "dst")
