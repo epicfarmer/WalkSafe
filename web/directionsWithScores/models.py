@@ -15,7 +15,6 @@ class Coordinates(models.Model):
 	@staticmethod
 	def round(value):
 		import decimal
-		value = decimal.Decimal(39.197233450625134)
 		if value is None:
 			raise ValueError
 
@@ -23,6 +22,23 @@ class Coordinates(models.Model):
 			value = decimal.Decimal(value)
 
 		return value.quantize(decimal.Decimal('0.1') ** Coordinates.PLACES)
+
+	def __lt__(self, other):
+		if self.lat < other.lat:
+			return True
+		elif self.lat == other.lat:
+			return self.lon < other.lon
+		else:
+			return False
+
+	def __gt__(self, other):
+		if self.lat > other.lat:
+			return True
+		elif self.lat == other.lat:
+			return self.lon > other.lon
+		else:
+			return False
+
 
 	class Meta:
 		unique_together = ("lat", "lon")

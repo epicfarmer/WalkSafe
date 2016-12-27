@@ -47,23 +47,22 @@ class DistanceMatrixRequest:
 		# googlemaps.exceptions.ApiError: INVALID_REQUEST
 		assert (len(self._points2) <= 25)
 		assert (len(self._points2) >= 1)
-		axis1 = [self._point1.lat, self._point1.lon]
+		axis1 = [[self._point1.lat, self._point1.lon]]
 		axis2 = []
 
 		print('Requesting distance matrix for')
 		print(axis1, axis2)
 
 		for c in self._points2:
-			axis2.append((c.lat, c.lon))
+			axis2.append((float(c.lat), float(c.lon)))
 		self._results = gRequest.distance_matrix(axis1, axis2)
 
 		for r in self._results['rows']:
-			src = Coordinates(lat=self._point1[0], lon=self._point1[1])
+			src = self._point1
 			for idx, e in enumerate(r['elements']):
-				point2 = self._points2[idx]
-				dst = Coordinates(lat=point2[0], lon=point2[1])
-				distance = Distance(src_coords=src,
-				                    dst_coords=dst,
+				dst = self._points2[idx]
+				distance = Distance(src=src,
+				                    dst=dst,
 				                    duration=e['duration']['value'],
 				                    distance=e['distance']['value'],
 				                    status=e['status'])
@@ -117,21 +116,20 @@ def baltimore_distance_matrix():
 
 		new_points = []
 		for new_point in itertools.product(new_lat, old_lon):
-			print("1", new_point)
 			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
 			                                                        lon=Coordinates.round(new_point[1]),
 			                                                        defaults={'update_date': datetime.datetime.now()})
 			new_coords.save()
 			new_points.append(new_coords)
+
 		for new_point in itertools.product(old_lat, new_lon):
-			print("2", new_point)
 			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
 			                                                        lon=Coordinates.round(new_point[1]),
 			                                                        defaults={'update_date': datetime.datetime.now()})
 			new_coords.save()
 			new_points.append(new_coords)
+
 		for new_point in itertools.product(new_lat, new_lon):
-			print("3", new_point)
 			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
 			                                                        lon=Coordinates.round(new_point[1]),
 			                                                        defaults={'update_date': datetime.datetime.now()})
@@ -148,7 +146,7 @@ def baltimore_distance_matrix():
 		for o in old_points:
 			if gridBaltimore.within(o):
 				request = DistanceMatrixRequest(o)
-				print('REQUEST: ', o)
+				print('REQUEST OLD/NEW: ', o)
 				for n in new_points:
 					if gridBaltimore.within(n):
 						if not request.add_point(n):
@@ -164,7 +162,7 @@ def baltimore_distance_matrix():
 		for n1 in new_points:
 			if gridBaltimore.within(n1):
 				request = DistanceMatrixRequest(n1)
-				print('REQUEST: ', n1)
+				print('REQUEST NEW/NEW: ', n1)
 				for n2 in new_points:
 					if gridBaltimore.within(n2) and n1 < n2:
 

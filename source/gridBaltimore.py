@@ -30,14 +30,15 @@ LAT_MAX = np.max(_BALTIMORE_GRID.exterior.xy[1])
 # assumes lat, lon coordinate
 def within(point):
 	if isinstance(point, Coordinates):
-		p = [point.lat, point.lon]
+		p = [float(point.lat), float(point.lon)]
 		point = p
-	print(point)
+	print("WITHIN1",point)
 
 	assert(len(point) == 2)
-	point = [point[1], point[0]]
-	if not hasattr(point, '_geom'):
-		point = sg.Point(point)
+	p = [point[1], point[0]]
+	print("WITHIN", p)
+	if not hasattr(p, '_geom'):
+		point = sg.Point(p)
 	return _BALTIMORE_GRID.contains(point)
 
 # returns a MultiPoint object (see shapely.geometry.Multipoint) containing the points in an appropriate grid with x_bins rows and y_bins columns.
