@@ -1,3 +1,6 @@
 # To run stuff from source if errors come up:
-PYTHONPATH=/Users/Kathryn/PycharmProjects/WalkSafe/web
-DJANGO_SETTINGS_MODULE=WalkSafeWeb.settings
+export PYTHONPATH=/Users/Kathryn/PycharmProjects/WalkSafe/web
+export DJANGO_SETTINGS_MODULE=WalkSafeWeb.settings
+
+# You may have to run: python manage.py migrate
+# See https://docs.djangoproject.com/en/1.10/intro/tutorial02/#
