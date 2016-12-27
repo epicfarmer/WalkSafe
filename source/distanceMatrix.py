@@ -124,24 +124,23 @@ def baltimore_distance_matrix():
 		new_points = []
 		for new_point in itertools.product(new_lat, old_lon):
 			print("1", new_point)
-			new_coords = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
+			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
 														   lon=Coordinates.round(new_point[1]),
 														   defaults={'update_date':datetime.datetime.now()})
 			new_coords.save()
 			new_points.append(new_coords)
 		for new_point in itertools.product(old_lat, new_lon):
 			print("2", new_point)
-			new_coords = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
+			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
 														   lon=Coordinates.round(new_point[1]),
 														   defaults={'update_date': datetime.datetime.now()})
 			new_coords.save()
 			new_points.append(new_coords)
 		for new_point in itertools.product(new_lat, new_lon):
 			print("3", new_point)
-			new_coords = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
+			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
 														   lon=Coordinates.round(new_point[1]),
 														   defaults={'update_date': datetime.datetime.now()})
-			#3 (39.197233450625134, -76.711293669970274)
 			new_points.append(new_coords)
 
 		print("NEW POINTS:", len(new_points))
@@ -167,6 +166,7 @@ def baltimore_distance_matrix():
 
 		# request directions between the new points
 		for n1 in new_points:
+			print(n1)
 			if gridBaltimore.within(n1):
 				request = DistanceMatrixRequest(n1)
 				for n2 in new_points:
