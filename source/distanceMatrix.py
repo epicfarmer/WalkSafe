@@ -10,26 +10,21 @@ import pickle
 import time
 import datetime
 import sys
-
 import decimal
-
 from directionsWithScores.models import Distance, Coordinates
-
-from django.db import connection
 
 
 class DistanceMatrixRequest:
-
 	def __init__(self, p1, p2s=list()):
 
-		assert(isinstance(p1, Coordinates))
-		assert(gridBaltimore.within(p1))
+		assert (isinstance(p1, Coordinates))
+		assert (gridBaltimore.within(p1))
 		self._point1 = p1
 
-		assert(len(p2s) <= 25)
+		assert (len(p2s) <= 25)
 		for p2 in p2s:
-			assert(isinstance(p2, Coordinates))
-			assert(gridBaltimore.within(p2))
+			assert (isinstance(p2, Coordinates))
+			assert (gridBaltimore.within(p2))
 		self._points2 = p2s
 
 		self._results = None
@@ -50,13 +45,13 @@ class DistanceMatrixRequest:
 
 	def request(self):
 		# googlemaps.exceptions.ApiError: INVALID_REQUEST
-		assert(len(self._points2) <= 25)
-		assert(len(self._points2) >= 1)
+		assert (len(self._points2) <= 25)
+		assert (len(self._points2) >= 1)
 		axis1 = [self._point1.lat, self._point1.lon]
 		axis2 = []
 
 		print('Requesting distance matrix for')
-		print (axis1, axis2)
+		print(axis1, axis2)
 
 		for c in self._points2:
 			axis2.append((c.lat, c.lon))
@@ -68,23 +63,21 @@ class DistanceMatrixRequest:
 				point2 = self._points2[idx]
 				dst = Coordinates(lat=point2[0], lon=point2[1])
 				distance = Distance(src_coords=src,
-						 dst_coords=dst,
-						 duration=e['duration']['value'],
-						 distance=e['distance']['value'],
-						 status=e['status'])
+				                    dst_coords=dst,
+				                    duration=e['duration']['value'],
+				                    distance=e['distance']['value'],
+				                    status=e['status'])
 				distance.save()
 
 		return self._results
 
 
 class RequestState:
-
 	def __init__(self, save_file='data/request_state'):
 		self._save_file = save_file
 
 
 class BaltimoreDistanceMatrix:
-
 	def __init__(self):
 		self._save_file = None
 		self._matrix = None
@@ -98,7 +91,9 @@ class BaltimoreDistanceMatrix:
 
 
 def save_results(results):
+	# TODO
 	pass
+
 
 # Get distance matrix over all of baltimore
 # input: RequestState
@@ -119,28 +114,28 @@ def baltimore_distance_matrix():
 	new_lat = [gridBaltimore.LAT_MIN, gridBaltimore.LAT_MAX]
 
 	while True:
-		# decimal.getcontext().prec = 7
 
 		new_points = []
 		for new_point in itertools.product(new_lat, old_lon):
 			print("1", new_point)
 			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
-														   lon=Coordinates.round(new_point[1]),
-														   defaults={'update_date':datetime.datetime.now()})
+			                                                        lon=Coordinates.round(new_point[1]),
+			                                                        defaults={'update_date': datetime.datetime.now()})
 			new_coords.save()
 			new_points.append(new_coords)
 		for new_point in itertools.product(old_lat, new_lon):
 			print("2", new_point)
 			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
-														   lon=Coordinates.round(new_point[1]),
-														   defaults={'update_date': datetime.datetime.now()})
+			                                                        lon=Coordinates.round(new_point[1]),
+			                                                        defaults={'update_date': datetime.datetime.now()})
 			new_coords.save()
 			new_points.append(new_coords)
 		for new_point in itertools.product(new_lat, new_lon):
 			print("3", new_point)
 			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
-														   lon=Coordinates.round(new_point[1]),
-														   defaults={'update_date': datetime.datetime.now()})
+			                                                        lon=Coordinates.round(new_point[1]),
+			                                                        defaults={'update_date': datetime.datetime.now()})
+			new_coords.save()
 			new_points.append(new_coords)
 
 		print("NEW POINTS:", len(new_points))
@@ -153,12 +148,13 @@ def baltimore_distance_matrix():
 		for o in old_points:
 			if gridBaltimore.within(o):
 				request = DistanceMatrixRequest(o)
+				print('REQUEST: ', o)
 				for n in new_points:
 					if gridBaltimore.within(n):
 						if not request.add_point(n):
 							results = request.request()
 							request.clear()
-							assert(request.add_point(n))
+							assert (request.add_point(n))
 						# yield o, n
 
 				results = request.request()
@@ -166,16 +162,16 @@ def baltimore_distance_matrix():
 
 		# request directions between the new points
 		for n1 in new_points:
-			print(n1)
 			if gridBaltimore.within(n1):
 				request = DistanceMatrixRequest(n1)
+				print('REQUEST: ', n1)
 				for n2 in new_points:
 					if gridBaltimore.within(n2) and n1 < n2:
 
 						if not request.add_point(n2):
 							results = request.request()
 							request.clear()
-							assert(request.add_point(n2))
+							assert (request.add_point(n2))
 						# yield n1, n2
 
 				if request.length() > 0:
@@ -209,78 +205,79 @@ def refining_baltimore_distance_matrix():
 		old_matrix = np.load('data/temp_distance_matrix.npy')
 	except:
 		print('creating new matrix')
-		[old_matrix,baltimore_grid] = baltimore_distance_matrix(3,3)
+		[old_matrix, baltimore_grid] = baltimore_distance_matrix(3, 3)
 
-	latitudes,longitudes = sg.asLineString(baltimore_grid).xy
-	locations = np.array([latitudes,longitudes]).T
+	latitudes, longitudes = sg.asLineString(baltimore_grid).xy
+	locations = np.array([latitudes, longitudes]).T
 	output = old_matrix
 
 	if (np.prod(np.shape(np.where(np.isnan(old_matrix)))) == 0):
-		new_xbins = (np.shape(np.unique(locations[:,0]))[0]+1)*2
-		new_ybins = (np.shape(np.unique(locations[:,1]))[0]+1)*2
-		new_baltimore_grid = gb.getBaltimoreGrid(new_xbins,new_ybins)
-		new_baltimore_grid.long,new_baltimore_grid.lat = sg.asLineString(new_baltimore_grid).xy
-		new_locations = np.array([new_baltimore_grid.lat,new_baltimore_grid.long]).T
+		new_xbins = (np.shape(np.unique(locations[:, 0]))[0] + 1) * 2
+		new_ybins = (np.shape(np.unique(locations[:, 1]))[0] + 1) * 2
+		new_baltimore_grid = gb.getBaltimoreGrid(new_xbins, new_ybins)
+		new_baltimore_grid.long, new_baltimore_grid.lat = sg.asLineString(new_baltimore_grid).xy
+		new_locations = np.array([new_baltimore_grid.lat, new_baltimore_grid.long]).T
 
-		a = np.tile(locations,[new_locations.shape[0],new_locations.shape[1],1,1])
+		a = np.tile(locations, [new_locations.shape[0], new_locations.shape[1], 1, 1])
 
-		print(a.shape,locations.shape,new_locations.shape)
-		#b = np.tile(new_locations,[1,1,locations.shape[0],locations.shape[1]])
-		#output = np.zeros([new_locations.shape[0],new_locations.shape[0]],np.float32)*np.nan
-		#a,b = np.meshgrid(locations,new_locations)
-		#print( a.shape,b.shape )
-		#print(locations.shape,new_locations.shape)
-		#print(a.shape)
+		print(a.shape, locations.shape, new_locations.shape)
+		# b = np.tile(new_locations,[1,1,locations.shape[0],locations.shape[1]])
+		# output = np.zeros([new_locations.shape[0],new_locations.shape[0]],np.float32)*np.nan
+		# a,b = np.meshgrid(locations,new_locations)
+		# print( a.shape,b.shape )
+		# print(locations.shape,new_locations.shape)
+		# print(a.shape)
 		quit()
 		for row in np.arange(locations.shape[0]):
-			new_row = np.where(np.sum(np.abs(locations[row,:] - new_locations),1) == 0)
+			new_row = np.where(np.sum(np.abs(locations[row, :] - new_locations), 1) == 0)
 			for col in np.arange(locations.shape[0]):
-				new_col = np.where(np.sum(np.abs(locations[col,:] - new_locations),1) == 0)
-				output[new_row,new_col] = old_matrix[row,col]
-				print(new_locations[new_row,:])
-				print(locations[row,:])
-			#for col in np.arange(locations.shape[0]):
+				new_col = np.where(np.sum(np.abs(locations[col, :] - new_locations), 1) == 0)
+				output[new_row, new_col] = old_matrix[row, col]
+				print(new_locations[new_row, :])
+				print(locations[row, :])
+			# for col in np.arange(locations.shape[0]):
 	print(np.where(np.isnan(output)))
 	print(output)
 	quit()
-	from_matrix = np.zeros([5,2])
-	to_matrix = np.zeros([5,2])
-	for i in np.arange(0,len(locations),5):
-		from_matrix = locations[i:i+5,:]
-		for j in np.arange(0,len(locations),5):
-			to_matrix = locations[j:j+5,:]
-			#print("Here")
-			#print(from_matrix.shape[0])
-			#print(to_matrix.shape[0])
+	from_matrix = np.zeros([5, 2])
+	to_matrix = np.zeros([5, 2])
+	for i in np.arange(0, len(locations), 5):
+		from_matrix = locations[i:i + 5, :]
+		for j in np.arange(0, len(locations), 5):
+			to_matrix = locations[j:j + 5, :]
+			# print("Here")
+			# print(from_matrix.shape[0])
+			# print(to_matrix.shape[0])
 			try:
-				request_result = GMAPS_CLIENT.distance_matrix(from_matrix,to_matrix,mode="walking")
+				request_result = GMAPS_CLIENT.distance_matrix(from_matrix, to_matrix, mode="walking")
 			except googlemaps.exceptions.Timeout:
-				np.save('data/baltimore_grid',test1,baltimore_grid)
-				np.save('data/temp_distance_matrix.npy',old_matrix)
-				return(output)
-			print(i,j)
+				np.save('data/baltimore_grid', test1, baltimore_grid)
+				np.save('data/temp_distance_matrix.npy', old_matrix)
+				return (output)
+			print(i, j)
 			time.sleep(1)
-			#print(output)
+			# print(output)
 			for k in np.arange(from_matrix.shape[0]):
 				for l in np.arange(to_matrix.shape[0]):
-					if(request_result['rows'][k]['elements'][l]['status'] == 'OK'):
-						output[i+k,j+l] = request_result['rows'][k]['elements'][l]['distance']['value']
+					if (request_result['rows'][k]['elements'][l]['status'] == 'OK'):
+						output[i + k, j + l] = request_result['rows'][k]['elements'][l]['distance']['value']
 					else:
-						np.save('data/baltimore_grid',baltimore_grid)
-						np.save('data/temp_distance_matrix.npy',old_matrix)
-						return(output)
-						print(geocode_result['rows'][i+k]['elements'][j+l])
-						output[i+k,j+l] = np.nan
-	#np.save('data/distance_matrix',output)
-	#np.save('data/baltimore_grid',baltimore_grid)
-	return(output)
+						np.save('data/baltimore_grid', baltimore_grid)
+						np.save('data/temp_distance_matrix.npy', old_matrix)
+						return (output)
+						print(geocode_result['rows'][i + k]['elements'][j + l])
+						output[i + k, j + l] = np.nan
+	# np.save('data/distance_matrix',output)
+	# np.save('data/baltimore_grid',baltimore_grid)
+	return (output)
+
 
 def process_result(request_result):
 	np.save('data/distance_matrix_1')
 
 
 if __name__ == '__main__':
-	#import matplotlib.pyplot as plt
+	# import matplotlib.pyplot as plt
 
 	num_points = 0
 	points = set()
@@ -295,7 +292,7 @@ if __name__ == '__main__':
 			print("2500!!!")
 			break
 
-		if num_points >= 28*2500:
+		if num_points >= 28 * 2500:
 			break
 
 	x = []
@@ -306,13 +303,13 @@ if __name__ == '__main__':
 	plt.scatter(x, y)
 	plt.show()
 
-	# print len(processed)
-	# print processed
+# print len(processed)
+# print processed
 
-	# View points and the lines between them
+# View points and the lines between them
 
-	# x = map(lambda i: i[0], processed)
-	# y = map(lambda i: i[1], processed)
+# x = map(lambda i: i[0], processed)
+# y = map(lambda i: i[1], processed)
 
-	# plt.scatter(x, y)
-	# plt.show()
+# plt.scatter(x, y)
+# plt.show()
