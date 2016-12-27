@@ -4,10 +4,25 @@ from django.db import models
 
 
 class Coordinates(models.Model):
+
+	PLACES = 7
+
 	# six decimal places is enough for 10cm accuracy
-	lat = models.DecimalField(max_digits=9, decimal_places=7)
-	lon = models.DecimalField(max_digits=10, decimal_places=7)
+	lat = models.DecimalField(max_digits=9, decimal_places=PLACES)
+	lon = models.DecimalField(max_digits=10, decimal_places=PLACES)
 	update_date = models.DateTimeField('date last updated', auto_now=True)
+
+	@staticmethod
+	def round(value):
+		import decimal
+		value = decimal.Decimal(39.197233450625134)
+		if value is None:
+			raise ValueError
+
+		if not isinstance(value, decimal.Decimal):
+			value = decimal.Decimal(value)
+
+		return value.quantize(decimal.Decimal('0.1') ** Coordinates.PLACES)
 
 	class Meta:
 		unique_together = ("lat", "lon")

@@ -9,10 +9,13 @@ import heapq
 import pickle
 import time
 import datetime
+import sys
 
 import decimal
 
 from directionsWithScores.models import Distance, Coordinates
+
+from django.db import connection
 
 
 class DistanceMatrixRequest:
@@ -116,27 +119,27 @@ def baltimore_distance_matrix():
 	new_lat = [gridBaltimore.LAT_MIN, gridBaltimore.LAT_MAX]
 
 	while True:
-		decimal.getcontext().prec = 7
+		# decimal.getcontext().prec = 7
 
 		new_points = []
 		for new_point in itertools.product(new_lat, old_lon):
 			print("1", new_point)
-			new_coords = Coordinates.objects.get_or_create(lat=decimal.Decimal(new_point[0]),
-														   lon=decimal.Decimal(new_point[1]),
+			new_coords = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
+														   lon=Coordinates.round(new_point[1]),
 														   defaults={'update_date':datetime.datetime.now()})
 			new_coords.save()
 			new_points.append(new_coords)
 		for new_point in itertools.product(old_lat, new_lon):
 			print("2", new_point)
-			new_coords = Coordinates.objects.get_or_create(lat=decimal.Decimal(new_point[0]),
-														   lon=decimal.Decimal(new_point[1]),
+			new_coords = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
+														   lon=Coordinates.round(new_point[1]),
 														   defaults={'update_date': datetime.datetime.now()})
 			new_coords.save()
 			new_points.append(new_coords)
 		for new_point in itertools.product(new_lat, new_lon):
 			print("3", new_point)
-			new_coords = Coordinates.objects.get_or_create(lat=decimal.Decimal(str(new_point[0])),
-														   lon=decimal.Decimal(str(new_point[1])),
+			new_coords = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
+														   lon=Coordinates.round(new_point[1]),
 														   defaults={'update_date': datetime.datetime.now()})
 			#3 (39.197233450625134, -76.711293669970274)
 			new_points.append(new_coords)
