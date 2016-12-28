@@ -51,7 +51,7 @@ class Distance(models.Model):
 	status = models.CharField(max_length=20)
 	distance = models.PositiveIntegerField()
 	duration = models.DurationField()  # With SQLite, big int field in microseconds
-	update_date = models.DateTimeField('date last updated')
+	update_date = models.DateTimeField('date last updated', auto_now=True)
 
 	class Meta:
 		unique_together = ("src", "dst")

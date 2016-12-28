@@ -50,22 +50,30 @@ class DistanceMatrixRequest:
 		axis1 = [[self._point1.lat, self._point1.lon]]
 		axis2 = []
 
+		for c in self._points2:
+			if not Distance.objects.filter(src=self._point1, dst=c).exists():
+				axis2.append((float(c.lat), float(c.lon)))
+
+		if len(axis2) == 0:
+			return 'Already requested'
+
 		print('Requesting distance matrix for')
 		print(axis1, axis2)
 
-		for c in self._points2:
-			axis2.append((float(c.lat), float(c.lon)))
 		self._results = gRequest.distance_matrix(axis1, axis2)
 
 		for r in self._results['rows']:
 			src = self._point1
 			for idx, e in enumerate(r['elements']):
+				print(e['status'])
 				dst = self._points2[idx]
-				distance = Distance(src=src,
-				                    dst=dst,
-				                    duration=e['duration']['value'],
-				                    distance=e['distance']['value'],
-				                    status=e['status'])
+				if Distance.objects.filter(src=src, dst=dst).exists():
+					distance = Distance.objects.get(src=src, dst=dst)
+				else:
+					distance = Distance(src=src, dst=dst)
+				distance.duration = datetime.timedelta(seconds=e['duration']['value'])
+				distance.distance = e['distance']['value']
+				distance.status = e['status']
 				distance.save()
 
 		return self._results
