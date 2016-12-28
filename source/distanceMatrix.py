@@ -47,7 +47,7 @@ class DistanceMatrixRequest:
 		# googlemaps.exceptions.ApiError: INVALID_REQUEST
 		assert (len(self._points2) <= 25)
 		assert (len(self._points2) >= 1)
-		axis1 = [[self._point1.lat, self._point1.lon]]
+		axis1 = [(self._point1.lat, self._point1.lon)]
 		axis2 = []
 
 		for c in self._points2:
