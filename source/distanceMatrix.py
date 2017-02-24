@@ -1,5 +1,6 @@
 import django
 django.setup()
+import datetime
 import numpy as np
 import gmapsRequest as gRequest
 import gridBaltimore
@@ -8,6 +9,7 @@ import heapq
 import time
 import datetime
 from directionsWithScores.models import Distance, Coordinates
+import logging
 
 
 class DistanceMatrixRequest:
@@ -53,15 +55,15 @@ class DistanceMatrixRequest:
 		if len(axis2) == 0:
 			return 'Already requested'
 
-		print('Requesting distance matrix for')
-		print(axis1, axis2)
+		logging.info('Requesting distance matrix for')
+		logging.info(axis1, axis2)
 
 		self._results = gRequest.distance_matrix(axis1, axis2)
 
 		for r in self._results['rows']:
 			src = self._point1
 			for idx, e in enumerate(r['elements']):
-				print(e['status'])
+				logging.info(e['status'])
 				dst = self._points2[idx]
 				if Distance.objects.filter(src=src, dst=dst).exists():
 					distance = Distance.objects.get(src=src, dst=dst)
@@ -269,20 +271,17 @@ def refining_baltimore_distance_matrix():
 	return (output)
 
 
-def process_result(request_result):
-	np.save('data/distance_matrix_1')
-
-
 if __name__ == '__main__':
-	import datetime
+	FORMAT = "%(levelname)s|%(asctime)-15s|%(message)s"
+	logging.basicConfig(level=logging.DEBUG, format=FORMAT)
 
 	num_points = 0
 	points = set()
-	print("%s: Starting script" % datetime.datetime.now())
+	logging.info("Starting script",)
 	for point1, point2 in baltimore_distance_matrix():
 		points.add(point1)
 		points.add(point2)
-		print(point1, point2)
+		# print(point1, point2)
 
 		num_points += 1
 
