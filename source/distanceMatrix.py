@@ -1,16 +1,12 @@
 import django
 django.setup()
-
 import numpy as np
 import gmapsRequest as gRequest
 import gridBaltimore
 import itertools
 import heapq
-import pickle
 import time
 import datetime
-import sys
-import decimal
 from directionsWithScores.models import Distance, Coordinates
 
 
@@ -112,11 +108,6 @@ def baltimore_distance_matrix():
 	old_lat = []
 	old_points = []
 
-	print("LON_MIN", gridBaltimore.LON_MIN)
-	print("LON_MAX", gridBaltimore.LON_MAX)
-	print("LAT_MIN", gridBaltimore.LAT_MIN)
-	print("LAT MAX", gridBaltimore.LAT_MAX)
-
 	new_lon = [gridBaltimore.LON_MIN, gridBaltimore.LON_MAX]
 	new_lat = [gridBaltimore.LAT_MIN, gridBaltimore.LAT_MAX]
 
@@ -144,17 +135,17 @@ def baltimore_distance_matrix():
 			new_coords.save()
 			new_points.append(new_coords)
 
-		print("NEW POINTS:", len(new_points))
-		print("OLD LON:", len(old_lon))
-		print("NEW LON:", len(new_lon))
-		print("OLD LAT:", len(old_lat))
-		print("NEW_LAT:", len(new_lat))
+		# print("NEW POINTS:", len(new_points))
+		# print("OLD LON:", len(old_lon))
+		# print("NEW LON:", len(new_lon))
+		# print("OLD LAT:", len(old_lat))
+		# print("NEW_LAT:", len(new_lat))
 
 		# request directions between all the old points and all the new points
 		for o in old_points:
 			if gridBaltimore.within(o):
 				request = DistanceMatrixRequest(o)
-				print('REQUEST OLD/NEW: ', o)
+				# print('REQUEST OLD/NEW: ', o)
 				for n in new_points:
 					if gridBaltimore.within(n):
 						if not request.add_point(n):
@@ -170,7 +161,7 @@ def baltimore_distance_matrix():
 		for n1 in new_points:
 			if gridBaltimore.within(n1):
 				request = DistanceMatrixRequest(n1)
-				print('REQUEST NEW/NEW: ', n1)
+				# print('REQUEST NEW/NEW: ', n1)
 				for n2 in new_points:
 					if gridBaltimore.within(n2) and n1 < n2:
 
@@ -220,7 +211,7 @@ def refining_baltimore_distance_matrix():
 	if (np.prod(np.shape(np.where(np.isnan(old_matrix)))) == 0):
 		new_xbins = (np.shape(np.unique(locations[:, 0]))[0] + 1) * 2
 		new_ybins = (np.shape(np.unique(locations[:, 1]))[0] + 1) * 2
-		new_baltimore_grid = gb.getBaltimoreGrid(new_xbins, new_ybins)
+		new_baltimore_grid = gridBaltimore.getBaltimoreGrid(new_xbins, new_ybins)
 		new_baltimore_grid.long, new_baltimore_grid.lat = sg.asLineString(new_baltimore_grid).xy
 		new_locations = np.array([new_baltimore_grid.lat, new_baltimore_grid.long]).T
 
@@ -283,10 +274,11 @@ def process_result(request_result):
 
 
 if __name__ == '__main__':
-	# import matplotlib.pyplot as plt
+	import datetime
 
 	num_points = 0
 	points = set()
+	print("%s: Starting script" % datetime.datetime.now())
 	for point1, point2 in baltimore_distance_matrix():
 		points.add(point1)
 		points.add(point2)
@@ -300,22 +292,3 @@ if __name__ == '__main__':
 
 		if num_points >= 28 * 2500:
 			break
-
-	x = []
-	y = []
-	for p in points:
-		x.append(p[0])
-		y.append(p[1])
-	plt.scatter(x, y)
-	plt.show()
-
-# print len(processed)
-# print processed
-
-# View points and the lines between them
-
-# x = map(lambda i: i[0], processed)
-# y = map(lambda i: i[1], processed)
-
-# plt.scatter(x, y)
-# plt.show()
