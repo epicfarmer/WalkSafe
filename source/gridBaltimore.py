@@ -32,11 +32,9 @@ def within(point):
 	if isinstance(point, Coordinates):
 		p = [float(point.lat), float(point.lon)]
 		point = p
-	print("WITHIN1",point)
 
 	assert(len(point) == 2)
 	p = [point[1], point[0]]
-	print("WITHIN", p)
 	if not hasattr(p, '_geom'):
 		point = sg.Point(p)
 	return _BALTIMORE_GRID.contains(point)

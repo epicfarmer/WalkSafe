@@ -26,7 +26,7 @@ SECRET_KEY = 'pgl(-l+4m9u(fu95c&bccdy$t(8(b6*hq!a*6m8z4!jv^o1lkl'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.2.171','192.168.2.53']
 
 # Application definition
 
