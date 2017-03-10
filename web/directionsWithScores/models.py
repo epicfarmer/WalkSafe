@@ -10,6 +10,8 @@ class Coordinates(models.Model):
 	# six decimal places is enough for 10cm accuracy
 	lat = models.DecimalField(max_digits=9, decimal_places=PLACES)
 	lon = models.DecimalField(max_digits=10, decimal_places=PLACES)
+	finished = models.BooleanField(default=False)
+	safety_score = models.DecimalField(default=1.0, max_digits=9, decimal_places=PLACES)
 	update_date = models.DateTimeField('date last updated', auto_now=True)
 
 	@staticmethod
@@ -38,7 +40,6 @@ class Coordinates(models.Model):
 			return self.lon > other.lon
 		else:
 			return False
-
 
 	class Meta:
 		unique_together = ("lat", "lon")
