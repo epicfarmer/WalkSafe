@@ -61,7 +61,7 @@ class DistanceMatrixRequest:
 		self._results = gRequest.distance_matrix(axis1, axis2)
 
 		logging.info("Finished request")
-
+		
 		assert(len(self._results['rows']) > 0)
 		for r in self._results['rows']:
 			src = self._point1
@@ -163,6 +163,7 @@ def baltimore_distance_matrix():
 				request.clear()
 
 		# request directions between the new points
+		logging.info("Requesting directions between new points(%i)" % len(new_points))
 		for n1 in new_points:
 			if gridBaltimore.within(n1):
 				request = DistanceMatrixRequest(n1)
@@ -178,6 +179,15 @@ def baltimore_distance_matrix():
 				if request.length() > 0:
 					request.request()
 				request.clear()
+
+		# mark as finished
+		for o in old_points:
+			o.finished = True
+			o.save()
+
+		for n in new_points:
+			n.finished = True
+			n.save()
 
 		# update old points
 		old_points = list(heapq.merge(old_points, new_points))
