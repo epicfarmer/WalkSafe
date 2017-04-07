@@ -31,5 +31,4 @@ def directions(origin, destination):
 # output:
 #	a numpy array where (i,j)th entry is the distance from locations[i] to locations[j]
 def distance_matrix(src_locations, dst_locations):
-	print(src_locations, dst_locations)
 	return GMAPS_CLIENT.distance_matrix(src_locations, dst_locations, mode="walking")

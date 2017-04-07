@@ -1,6 +1,6 @@
 import django
 django.setup()
-import datetime
+
 import numpy as np
 import gmapsRequest as gRequest
 import gridBaltimore
@@ -56,12 +56,16 @@ class DistanceMatrixRequest:
 			return 'Already requested'
 
 		logging.info('Requesting distance matrix for')
-		logging.info(axis1, axis2)
+		logging.info((axis1, axis2))
 
 		self._results = gRequest.distance_matrix(axis1, axis2)
 
+		logging.info("Finished request")
+
+		assert(len(self._results['rows']) > 0)
 		for r in self._results['rows']:
 			src = self._point1
+			assert(len(r['elements']) > 0)
 			for idx, e in enumerate(r['elements']):
 				logging.info(e['status'])
 				dst = self._points2[idx]
@@ -73,6 +77,7 @@ class DistanceMatrixRequest:
 				distance.distance = e['distance']['value']
 				distance.status = e['status']
 				distance.save()
+				logging.info("Saved distance between %s and %s" %  (src, dst))
 
 		return self._results
 
@@ -120,61 +125,58 @@ def baltimore_distance_matrix():
 			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
 			                                                        lon=Coordinates.round(new_point[1]),
 			                                                        defaults={'update_date': datetime.datetime.now()})
-			new_coords.save()
+			if created:
+				new_coords.save()
 			new_points.append(new_coords)
 
 		for new_point in itertools.product(old_lat, new_lon):
 			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
 			                                                        lon=Coordinates.round(new_point[1]),
 			                                                        defaults={'update_date': datetime.datetime.now()})
-			new_coords.save()
+			if created:
+				new_coords.save()
 			new_points.append(new_coords)
 
 		for new_point in itertools.product(new_lat, new_lon):
 			new_coords, created = Coordinates.objects.get_or_create(lat=Coordinates.round(new_point[0]),
 			                                                        lon=Coordinates.round(new_point[1]),
 			                                                        defaults={'update_date': datetime.datetime.now()})
-			new_coords.save()
+			if created:
+				new_coords.save()
 			new_points.append(new_coords)
 
-		# print("NEW POINTS:", len(new_points))
-		# print("OLD LON:", len(old_lon))
-		# print("NEW LON:", len(new_lon))
-		# print("OLD LAT:", len(old_lat))
-		# print("NEW_LAT:", len(new_lat))
-
 		# request directions between all the old points and all the new points
+		logging.info("Requesting directions between old points(%i) and new points(%i)" %
+		             (len(old_points), len(new_points)))
 		for o in old_points:
 			if gridBaltimore.within(o):
 				request = DistanceMatrixRequest(o)
-				# print('REQUEST OLD/NEW: ', o)
 				for n in new_points:
 					if gridBaltimore.within(n):
 						if not request.add_point(n):
-							results = request.request()
+							request.request()
 							request.clear()
 							assert (request.add_point(n))
 						# yield o, n
 
-				results = request.request()
+				request.request()
 				request.clear()
 
 		# request directions between the new points
 		for n1 in new_points:
 			if gridBaltimore.within(n1):
 				request = DistanceMatrixRequest(n1)
-				# print('REQUEST NEW/NEW: ', n1)
 				for n2 in new_points:
 					if gridBaltimore.within(n2) and n1 < n2:
 
 						if not request.add_point(n2):
-							results = request.request()
+							request.request()
 							request.clear()
 							assert (request.add_point(n2))
 						# yield n1, n2
 
 				if request.length() > 0:
-					results = request.request()
+					request.request()
 				request.clear()
 
 		# update old points
@@ -266,8 +268,7 @@ def refining_baltimore_distance_matrix():
 						return (output)
 						print(geocode_result['rows'][i + k]['elements'][j + l])
 						output[i + k, j + l] = np.nan
-	# np.save('data/distance_matrix',output)
-	# np.save('data/baltimore_grid',baltimore_grid)
+
 	return (output)
 
 
@@ -281,7 +282,6 @@ if __name__ == '__main__':
 	for point1, point2 in baltimore_distance_matrix():
 		points.add(point1)
 		points.add(point2)
-		# print(point1, point2)
 
 		num_points += 1
 
